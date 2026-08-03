@@ -1,5 +1,6 @@
 stages:
 - build
+- test
 
 build-image:
   stage: build
@@ -15,3 +16,18 @@ build-image:
   - buildah push "$CI_REGISTRY_IMAGE:latest"
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+smoke-test:
+  stage: test
+  image: "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+  needs:
+  - build-image
+  rules:
+  - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+  - buildah version
+  - buildah info
+  - |
+    echo 'FROM alpine:latest' | buildah build -t smoke-test -f - .
+    buildah rmi smoke-test
+  - docker build --help > /dev/null
