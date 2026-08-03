@@ -10,6 +10,7 @@ RUN echo '[storage]\n\
 driver = "vfs"\n\
 runroot = "/var/lib/containers/runroot"\n\
 graphroot = "/var/lib/containers/storage"' > /etc/containers/storage.conf
+RUN echo 'unqualified-search-registries = ["docker.io"]' > /etc/containers/registries.conf
 
 RUN echo '#!/bin/bash\n\
 shopt -s expand_aliases\n\
