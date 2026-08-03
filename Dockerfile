@@ -2,7 +2,6 @@ FROM ubuntu:24.04
 
 RUN apt-get update && apt-get install -y \
     buildah \
-    fuse-overlayfs \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -10,9 +9,7 @@ RUN mkdir -p /etc/containers
 RUN echo '[storage]\n\
 driver = "vfs"\n\
 runroot = "/var/lib/containers/runroot"\n\
-graphroot = "/var/lib/containers/storage"\n\
-[storage.options]\n\
-mount_program = "/usr/bin/fuse-overlayfs"' > /etc/containers/storage.conf
+graphroot = "/var/lib/containers/storage"' > /etc/containers/storage.conf
 
 RUN echo '#!/bin/bash\n\
 shopt -s expand_aliases\n\
