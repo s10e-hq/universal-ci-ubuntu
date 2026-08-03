@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
 RUN mkdir -p /etc/containers
 RUN echo '[storage]\n\
 driver = "vfs"\n\
+runroot = "/var/lib/containers/runroot"\n\
+graphroot = "/var/lib/containers/storage"\n\
 [storage.options]\n\
 mount_program = "/usr/bin/fuse-overlayfs"' > /etc/containers/storage.conf
 
