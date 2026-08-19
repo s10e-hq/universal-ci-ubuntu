@@ -6,7 +6,7 @@ on:
       - master
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -27,6 +27,21 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Generate CalVer tag
+        id: calver
+        run: |
+          YEAR_MONTH=$(date -u +%Y.%m)
+          LATEST_PATCH=$(gh api repos/${{ github.repository }}/tags --jq "[.[].name | select(startswith(\"v${YEAR_MONTH}.\"))] | map(ltrimstr(\"v${YEAR_MONTH}.\") | tonumber) | max // -1")
+          TAG="v${YEAR_MONTH}.$((LATEST_PATCH + 1))"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create git tag
+        run: |
+          git tag "${{ steps.calver.outputs.tag }}"
+          git push origin "${{ steps.calver.outputs.tag }}"
+
       - name: Extract metadata (tags, labels)
         id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6
@@ -34,7 +49,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=latest
-            type=sha,format=short
+            type=raw,value=${{ steps.calver.outputs.tag }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4

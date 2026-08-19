@@ -8,11 +8,20 @@ build-image:
   before_script:
   - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
+  - YEAR_MONTH=$(date -u +%Y.%m)
+  - |
+    LATEST_PATCH=$(curl -sf --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      "$CI_API_V4_URL/projects/$CI_PROJECT_ID/registry/repositories" \
+      | jq -r --arg prefix "v${YEAR_MONTH}." \
+        '[.[].tags[]?.name // empty | select(startswith($prefix)) | ltrimstr($prefix) | tonumber] | max // -1')
+    TAG="v${YEAR_MONTH}.$((LATEST_PATCH + 1))"
   - buildah build
     -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    -t "$CI_REGISTRY_IMAGE:$TAG"
     -t "$CI_REGISTRY_IMAGE:latest"
     .
   - buildah push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+  - buildah push "$CI_REGISTRY_IMAGE:$TAG"
   - buildah push "$CI_REGISTRY_IMAGE:latest"
   rules:
   - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
