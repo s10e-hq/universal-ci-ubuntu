@@ -4,6 +4,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     buildah \
     ca-certificates \
+    netavark \
     curl \
     git \
     jq \
