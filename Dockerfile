@@ -1,8 +1,13 @@
 FROM ubuntu:26.04
 
 RUN apt-get update && apt-get install -y \
+    bash \
     buildah \
     ca-certificates \
+    curl \
+    git \
+    jq \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /etc/containers
