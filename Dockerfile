@@ -15,7 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV AQUA_ROOT_DIR="/usr/local/share/aquaproj-aqua"
 ENV PATH="${AQUA_ROOT_DIR}/bin:${PATH}"
-RUN curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v4.0.2/aqua-installer | bash -s -- -i "${AQUA_ROOT_DIR}/bin/aqua"
+RUN curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v4.0.2/aqua-installer -o /tmp/aqua-installer && \
+    bash /tmp/aqua-installer -i "${AQUA_ROOT_DIR}/bin/aqua" && \
+    rm /tmp/aqua-installer
 COPY aqua.yaml /tmp/aqua.yaml
 RUN cd /tmp && aqua install && rm aqua.yaml
 
