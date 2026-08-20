@@ -1,17 +1,23 @@
-FROM ubuntu:26.04
+FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     buildah \
     ca-certificates \
-    netavark \
     curl \
     git \
     jq \
+    netavark \
     rsync \
     wget \
     zip \
     && rm -rf /var/lib/apt/lists/*
+
+ENV AQUA_ROOT_DIR="/usr/local/share/aquaproj-aqua"
+ENV PATH="${AQUA_ROOT_DIR}/bin:${PATH}"
+RUN curl -sSfL https://raw.githubusercontent.com/aquaproj/aqua-installer/v4.0.2/aqua-installer | bash -s -- -i "${AQUA_ROOT_DIR}/bin/aqua"
+COPY aqua.yaml /tmp/aqua.yaml
+RUN cd /tmp && aqua install && rm aqua.yaml
 
 RUN mkdir -p /etc/containers
 RUN echo '[storage]\n\
