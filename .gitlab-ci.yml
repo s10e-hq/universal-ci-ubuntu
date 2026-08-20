@@ -4,7 +4,6 @@ stages:
 
 build-image:
   stage: build
-  image: ghcr.io/s10e-hq/universal-ci-ubuntu:latest
   before_script:
   - buildah login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
   script:
